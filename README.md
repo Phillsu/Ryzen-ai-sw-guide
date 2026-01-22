@@ -158,9 +158,7 @@ python quicktest.py
 ```
 
 應可正常看到 `Test Passed` 輸出。
-```
 
-```
 ## 📬 貢獻與回饋
 歡迎提交 Issue 或 PR 改進本指南！  
 作者：Phillip Su  
