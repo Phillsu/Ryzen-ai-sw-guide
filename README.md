@@ -156,6 +156,129 @@ python quicktest.py
 
 應可正常看到 `Test Passed` 輸出。
 
+## Ryzen AI LLM - Onnxruntime GenAI example debug note
+
+---
+
+### 🛠 CMake 建構常見問題與解決方案（Windows + Ryzen AI）
+
+在 Windows 上使用 CMake 建構 AMD Ryzen AI 範例（如 `llm/oga_api`）時，常會遇到以下錯誤。本指南提供標準化除錯流程。
+
+---
+
+#### ❌ 錯誤 1：找不到 `CMakeLists.txt`
+```text
+CMake Error: The source directory "..." does not appear to contain CMakeLists.txt.
+```
+
+✅ **原因**：  
+你指定的來源目錄（通常是 `..`）沒有 `CMakeLists.txt`。
+
+✅ **解決方法**：
+1. 先確認 `CMakeLists.txt` 位置：
+   ```cmd
+   dir /s CMakeLists.txt
+   ```
+2. 從 `build` 目錄正確指向根目錄（假設 `CMakeLists.txt` 在 `RyzenAI-SW/`）：
+   ```cmd
+   cd example\llm\oga_api\build
+   cmake ..\..\..\.. -G "Visual Studio 17 2022" -A x64
+   ```
+
+> 💡 多數 Ryzen AI 範例的 `CMakeLists.txt` 位於 **專案根目錄**，而非範例子目錄。
+
+---
+
+#### ❌ 錯誤 2：Ninja 不支援 `-A x64`
+```text
+Generator Ninja does not support platform specification, but platform x64 was specified.
+CMAKE_C_COMPILER not set
+```
+
+✅ **原因**：  
+`-A x64` 是 Visual Studio Generator 專用參數，**Ninja 不支援**。同時，普通終端機未設定 MSVC 編譯器環境。
+
+✅ **解決方法（二選一）**：
+
+##### ✅ 選項 A：使用 Visual Studio Generator（推薦）
+```cmd
+cmake .. -G "Visual Studio 17 2022" -A x64
+```
+> 替換 `17` 為你的 Visual Studio 年份（2022 → 17, 2019 → 16）
+
+##### ✅ 選項 B：使用 Ninja（需正確環境）
+1. 開啟 **x64 Native Tools Command Prompt for VS 2022**
+2. 執行：
+   ```cmd
+   cmake .. -G Ninja
+   ```
+   > ⚠️ **不要加 `-A x64`**
+
+---
+
+#### ❌ 錯誤 3：`CMAKE_CXX_COMPILER not set`
+```text
+CMAKE_C_COMPILER not set, after EnableLanguage
+```
+
+✅ **原因**：  
+CMake 找不到 MSVC 編譯器（`cl.exe`），通常因未在 Visual Studio 開發環境中執行。
+
+✅ **解決方法**：
+- **務必從「x64 Native Tools Command Prompt」啟動終端機**
+  - 開始功能表 → 搜尋：`x64 Native Tools Command Prompt for VS 2022`
+- 或手動設定環境（不推薦）：
+  ```cmd
+  "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
+  ```
+
+---
+
+#### ✅ 標準建構流程（推薦步驟）
+
+```cmd
+# 1. 開啟「x64 Native Tools Command Prompt for VS 2022」
+
+# 2. 進入專案
+cd D:\RyzenCompute\RyzenAI-SW
+
+# 3. 啟用 Conda 環境
+conda activate ryzen-ai-1.6.1
+
+# 4. 建立並進入 build 目錄
+cd example\llm\oga_api
+rmdir /s build 2>nul
+mkdir build && cd build
+
+# 5. 執行 CMake（使用 Visual Studio Generator）
+cmake ..\..\..\.. -G "Visual Studio 17 2022" -A x64
+
+# 6. 建構（可選）
+cmake --build . --config Release
+```
+
+> ✅ 成功後會生成 `.sln` 檔，可用 Visual Studio 開啟。
+
+---
+
+#### 🔍 附錄：環境檢查命令
+
+| 檢查項目 | 命令 |
+|--------|------|
+| CMake 版本 | `cmake --version` |
+| 是否有 cl.exe | `where cl`（需在 VS 開發環境中） |
+| 支援的 Generators | `cmake --help \| findstr Generator` |
+
+---
+
+#### 📌 注意事項
+- **不要混用 Miniforge Prompt 與普通 CMD**：確保在 **VS 開發環境** 中啟動 Conda。
+- **路徑勿含空格或中文**：避免 CMake 解析錯誤。
+- **首次建構建議用 Visual Studio Generator**：相容性最佳。
+
+---
+
+
 ## 📬 貢獻與回饋
 歡迎提交 Issue 或 PR 改進本指南！  
 作者：Phillip Su  
