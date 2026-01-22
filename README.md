@@ -90,9 +90,6 @@ Test Passed
 
 ---
 
-當然！以下是將你提供的錯誤說明與修復方案，**以清晰、專業的格式整合到 `README.md` 末尾**的內容，可直接附加在原有 README 後面：
-
-```markdown
 ## 🛠 常見問題：`UnicodeDecodeError`（非英文系統）
 
 在中文、日文等非英文 Windows 系統上執行 `quicktest.py` 時，可能遇到以下錯誤：
