@@ -166,30 +166,7 @@ python quicktest.py
 
 ---
 
-#### ❌ 錯誤 1：找不到 `CMakeLists.txt`
-```text
-CMake Error: The source directory "..." does not appear to contain CMakeLists.txt.
-```
-
-✅ **原因**：  
-你指定的來源目錄（通常是 `..`）沒有 `CMakeLists.txt`。
-
-✅ **解決方法**：
-1. 先確認 `CMakeLists.txt` 位置：
-   ```cmd
-   dir /s CMakeLists.txt
-   ```
-2. 從 `build` 目錄正確指向根目錄（假設 `CMakeLists.txt` 在 `RyzenAI-SW/`）：
-   ```cmd
-   cd example\llm\oga_api\build
-   cmake ..\..\..\.. -G "Visual Studio 17 2022" -A x64
-   ```
-
-> 💡 多數 Ryzen AI 範例的 `CMakeLists.txt` 位於 **專案根目錄**，而非範例子目錄。
-
----
-
-#### ❌ 錯誤 2：Ninja 不支援 `-A x64`
+#### ❌ 錯誤 1：Ninja 不支援 `-A x64`
 ```text
 Generator Ninja does not support platform specification, but platform x64 was specified.
 CMAKE_C_COMPILER not set
@@ -216,7 +193,7 @@ cmake .. -G "Visual Studio 17 2022" -A x64
 
 ---
 
-#### ❌ 錯誤 3：`CMAKE_CXX_COMPILER not set`
+#### ❌ 錯誤 2：`CMAKE_CXX_COMPILER not set`
 ```text
 CMAKE_C_COMPILER not set, after EnableLanguage
 ```
