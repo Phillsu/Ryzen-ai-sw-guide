@@ -96,5 +96,3 @@ Test Passed
 設備：AMD Ryzen AI 7 350W + Windows 11
 
 --- 
-
-> ⚡ 現在，你已成功啟用 Ryzen AI NPU，可開始部署高效能、低功耗的邊緣 AI 推理應用！
