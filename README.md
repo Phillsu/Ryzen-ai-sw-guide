@@ -90,6 +90,77 @@ Test Passed
 
 ---
 
+當然！以下是將你提供的錯誤說明與修復方案，**以清晰、專業的格式整合到 `README.md` 末尾**的內容，可直接附加在原有 README 後面：
+
+```markdown
+## 🛠 常見問題：`UnicodeDecodeError`（非英文系統）
+
+在中文、日文等非英文 Windows 系統上執行 `quicktest.py` 時，可能遇到以下錯誤：
+
+```
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xbf in position 158: invalid start byte
+```
+
+### 🔍 原因
+`pnputil /enum-devices` 命令的輸出使用系統本地 ANSI 編碼（如繁體中文 Windows 使用 `cp950`），但原始腳本強制以 UTF-8 解碼，導致解碼失敗。
+
+### ✅ 解決方法
+修改 `quicktest.py` 中的 `get_npu_info()` 函數，使用系統預設編碼進行解碼。
+
+#### 步驟 1：在檔案開頭加入 `import locale`
+確保 import 區塊包含：
+```python
+import locale
+import subprocess
+```
+
+#### 步驟 2：替換 `get_npu_info()` 函數為以下版本：
+```python
+def get_npu_info():
+    command = r'pnputil /enum-devices /bus PCI /deviceids'
+    process = subprocess.Popen(
+        command,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    stdout, stderr = process.communicate()
+
+    # Use system's preferred encoding (e.g., cp950 for Traditional Chinese Windows)
+    encoding = locale.getpreferredencoding()
+    try:
+        output = stdout.decode(encoding)
+    except (UnicodeDecodeError, LookupError):
+        # Fallback: ignore problematic bytes
+        output = stdout.decode('utf-8', errors='ignore')
+
+    npu_type = ''
+    if 'PCI\\VEN_1022&DEV_1502&REV_00' in output:
+        npu_type = 'PHX/HPT'
+    elif any(dev in output for dev in [
+        'PCI\\VEN_1022&DEV_17F0&REV_00',
+        'PCI\\VEN_1022&DEV_17F0&REV_10',
+        'PCI\\VEN_1022&DEV_17F0&REV_11'
+    ]):
+        npu_type = 'STX'
+    elif 'PCI\\VEN_1022&DEV_17F0&REV_20' in output:
+        npu_type = 'KRK'
+    return npu_type
+```
+
+> 💡 此修正會自動適配你的系統語言環境，並在極端情況下安全降級，避免崩潰。
+
+保存後重新執行：
+```bash
+conda activate ryzen-ai-1.6.1
+cd %RYZEN_AI_INSTALLATION_PATH%\quicktest
+python quicktest.py
+```
+
+應可正常看到 `Test Passed` 輸出。
+```
+
+```
 ## 📬 貢獻與回饋
 歡迎提交 Issue 或 PR 改進本指南！  
 作者：Phillip Su  
