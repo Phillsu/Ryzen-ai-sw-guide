@@ -257,7 +257,7 @@ cmake --build . --config Release
 
 
 ## 📬 貢獻與回饋
-歡迎提交 Issue 或 PR 改進本指南！  
+歡迎提交 Issue 討論 ! 
 作者：Phillip Su  
 設備：AMD Ryzen AI 7 350W + Windows 11
 
